@@ -17,6 +17,12 @@ const LINE =
 const outDir = process.env.OUTPUT_DIR ?? "/output";
 mkdirSync(outDir, { recursive: true });
 const file = join(outDir, "entry.txt");
+// Gate guard: the sealed scorer only accepts 1-200 characters of
+// non-whitespace UTF-8 text. Refuse to write an invalid line rather
+// than submitting a dud.
+if (LINE.length < 1 || LINE.length > 200 || LINE.trim().length === 0) {
+  throw new Error(`entry line must be 1-200 non-blank characters, got ${LINE.length}`);
+}
 writeFileSync(file, LINE, "utf8");
 try {
   chmodSync(file, 0o644);
